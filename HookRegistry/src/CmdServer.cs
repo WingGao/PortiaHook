@@ -1,4 +1,5 @@
 using Pathea;
+using Pathea.AchievementNs;
 using Pathea.ItemSystem;
 using Pathea.ModuleNs;
 using System;
@@ -17,6 +18,11 @@ namespace Hooks
 
 		public void Start()
 		{
+			if(_listener != null && _listener.IsListening)
+			{
+				return;
+			}
+
 			_listener = new HttpListener();
 			if (!HookRegistry.IsWithinUnity())
 			{
@@ -40,6 +46,13 @@ namespace Hooks
 			//}
 			//_listener.BeginGetContext(new AsyncCallback(GetContextCallBack), _listener);
 			System.Threading.ThreadPool.QueueUserWorkItem(Listen);
+		}
+
+		public void Stop()
+		{
+			_listener.Stop();
+			listenForNextRequest.Set();
+			IsRunning = false;
 		}
 		public bool IsRunning { get; private set; }
 
@@ -102,7 +115,7 @@ namespace Hooks
 						int num = Convert.ToInt32(numStr);
 						if (HookRegistry.IsWithinUnity())
 						{
-							Module<Player>.Self.bag.AddItem(id,num, true, AddItemMode.Default);
+							Module<Player>.Self.bag.AddItem(id, num, true, AddItemMode.Default);
 							HookRegistry.Debug("AddItem {0}", id);
 						}
 						else
@@ -110,6 +123,19 @@ namespace Hooks
 							
 						}
 						
+					}
+					break;
+				case "UnlockAchievement":
+					{
+						int id = Convert.ToInt32(args["id"].Trim());
+						if (HookRegistry.IsWithinUnity())
+						{
+							if (Module<AchievementModule>.Self.IsAchievementUnlocked(id))
+							{
+								return String.Format("{0} is unlocked", id);
+							}
+							Module<AchievementModule>.Self.UnlockAchievement(id);
+						}
 					}
 					break;
 				case "Test":

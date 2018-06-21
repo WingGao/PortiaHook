@@ -5,7 +5,26 @@
 
 ## 功能
 
-[x] 添加物品
+ [x]  添加物品
+ [x]  成就解锁
+
+## SQL
+#### 查询物品数据
+```sql
+SELECT Translation_hint.Chinese, Props_total_table.* FROM "Props_total_table" JOIN "Translation_hint" ON Props_total_table.Props_Name = Translation_hint.ID
+WHERE Translation_hint.Chinese LIKE "冬娃%"
+```
+#### 查询古物
+```sql
+SELECT Translation_hint.Chinese,ExhibitData.*, Props_total_table.* FROM "Props_total_table" JOIN "Translation_hint", ExhibitData ON Props_total_table.Props_Name = Translation_hint.ID and ExhibitData.itemId = Props_total_table.Props_Id
+```
+#### 查询成就
+```sql
+SELECT 
+(SELECT Chinese FROM Translation_hint WHERE Translation_hint.ID=name)as nameCN,
+(SELECT Chinese FROM Translation_hint WHERE Translation_hint.ID=description)as descriptionCN,
+* FROM "Achievement" 
+```
 
 ## Hooker
 
