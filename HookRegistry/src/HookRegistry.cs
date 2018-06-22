@@ -57,7 +57,7 @@ namespace Hooks
 		private static HookRegistry _instance;
 		private static object _initLock = new object();
 		private bool _isInitialised = false;
-		CmdServer ctrlServer;
+		public CmdServer CtrlServer;
 
 		public static HookRegistry Get()
 		{
@@ -107,8 +107,7 @@ namespace Hooks
 
 					// Setup all hook information.
 					LoadRuntimeHooks();
-					ctrlServer = new CmdServer();
-					ctrlServer.Start();
+					CtrlServer = new CmdServer();
 				}
 			}
 			_isInitialised = true;

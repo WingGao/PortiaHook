@@ -33,8 +33,9 @@ namespace Hooks
 		public static string[] GetExpectedMethods()
 		{
 			return new string[] {
-				"Pathea.ItemBoxNs.ItemBoxModule::InitChestData2",
-				"Pathea.Player::GainItems"
+				"UILoader::OnInit",
+				"UILoader::OnRelease",
+				"Pathea.RiderNs.RidableModuleManager::TryDecreaseLoyalty",
 			};
 		}
 
@@ -42,9 +43,14 @@ namespace Hooks
 		{
 			switch (typeName + "::" + methodName)
 			{
-				case "Pathea.Player::GainItems":
-					GainItems(thisObj, args);
+				case "UILoader::OnInit":
+					HookRegistry.Get().CtrlServer.Start();
 					return null;
+				case "UILoader::OnRelease":
+					HookRegistry.Get().CtrlServer.Stop();
+					return null;
+				case "Pathea.RiderNs.RidableModuleManager::TryDecreaseLoyalty": //忠诚不减
+					return false;
 				default:
 					return null;
 			}

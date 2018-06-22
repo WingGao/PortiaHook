@@ -1,12 +1,16 @@
 using Pathea;
 using Pathea.AchievementNs;
 using Pathea.ItemSystem;
+using Pathea.MessageSystem;
+using Pathea.Missions;
 using Pathea.ModuleNs;
+using Pathea.StoreNs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using UnityEngine;
 
 namespace Hooks
 {
@@ -18,7 +22,7 @@ namespace Hooks
 
 		public void Start()
 		{
-			if(_listener != null && _listener.IsListening)
+			if (_listener != null && _listener.IsListening)
 			{
 				return;
 			}
@@ -78,7 +82,8 @@ namespace Hooks
 					res = "error";
 				}
 			}
-			catch(Exception ex) {
+			catch (Exception ex)
+			{
 				res = ex.ToString();
 				context.Response.StatusCode = 403;
 			}
@@ -105,7 +110,7 @@ namespace Hooks
 			{
 				case "AddItem":
 					string numStr;
-					if(!args.TryGetValue("num",out numStr))
+					if (!args.TryGetValue("num", out numStr))
 					{
 						numStr = "1";
 					}
@@ -115,14 +120,14 @@ namespace Hooks
 						int num = Convert.ToInt32(numStr);
 						if (HookRegistry.IsWithinUnity())
 						{
-							Module<Player>.Self.bag.AddItem(id, num, true, AddItemMode.Default);
 							HookRegistry.Debug("AddItem {0}", id);
+							Module<Player>.Self.bag.AddItem(id, num, false, AddItemMode.ForceBag);
 						}
 						else
 						{
-							
+
 						}
-						
+
 					}
 					break;
 				case "UnlockAchievement":
@@ -137,6 +142,31 @@ namespace Hooks
 							Module<AchievementModule>.Self.UnlockAchievement(id);
 						}
 					}
+					break;
+				case "MissionAll":
+					{
+						StringBuilder sb = new StringBuilder();
+						foreach (MissionBaseInfo missionBaseInfo in MissionManager.allMissionBaseInfo.Values)
+						{
+							sb.Append(missionBaseInfo.InstanceID);
+							sb.Append(", ");
+							sb.Append(missionBaseInfo.MissionNO);
+							sb.Append(", ");
+							string name = TextMgr.GetOriginStr(missionBaseInfo.MissionNameId);
+							sb.Append(name);
+							sb.Append(", ");
+							sb.AppendLine();
+						}
+						return sb.ToString();
+					}
+					
+				case "TransportMap":
+					{
+						MessageManager.Instance.Dispatch("TransportMap", new object[] { }, DispatchType.IMME, 2f);
+					}
+					break;
+				case "RefreshPriceIndex": //更新物价指数
+					Module<StoreManagerV40>.Self.RefreshPriceIndex();
 					break;
 				case "Test":
 					return "test";

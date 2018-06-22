@@ -23,6 +23,8 @@
 
 // Hooks the mono system layer to Tee network data.
 // The socket methods have multiple versions with different parameters!
-Pathea.ItemBoxNs.ItemBoxModule::InitChestData
-Pathea.Player::GainItems
-
+//Pathea.ItemBoxNs.ItemBoxModule::InitChestData
+//Pathea.Player::GainItems
+UILoader::OnInit
+UILoader::OnRelease
+Pathea.RiderNs.RidableModuleManager::TryDecreaseLoyalty
