@@ -5,8 +5,13 @@
 // To enable this hook, add "BattleNetCSharp::Init" to example_hooks
 
 
+using Pathea.ActorNs;
+using Pathea.EG;
+using Pathea.FavorSystemNs;
+using Pathea.ModuleNs;
 using System;
 using System.Reflection;
+using System.Threading;
 
 namespace Hooks
 {
@@ -36,6 +41,9 @@ namespace Hooks
 				"UILoader::OnInit",
 				"UILoader::OnRelease",
 				"Pathea.RiderNs.RidableModuleManager::TryDecreaseLoyalty",
+				"Pathea.EG.EGMgr::StartEngagement",
+				"Pathea.EG.EGMgr::StopEngagement",
+				"Pathea.FavorSystemNs.FavorUtility::GetFavorBehaviorInfo",
 			};
 		}
 
@@ -51,6 +59,39 @@ namespace Hooks
 					return null;
 				case "Pathea.RiderNs.RidableModuleManager::TryDecreaseLoyalty": //忠诚不减
 					return false;
+				case "Pathea.EG.EGMgr::StartEngagement":// 约会/玩耍直接满
+					{
+						var egMgr = (EGMgr)thisObj;
+						if (egMgr.IsEngagement())
+						{
+							var th = new Thread(()=> {
+								HookRegistry.Debug("[StartEngagement] wait 3 second");
+								Thread.Sleep(3000);
+								var mDate = (EGDate)HookRegistry.GetInstanceField(typeof(EGMgr), thisObj, "mDate");
+								mDate.SetMood(100);
+								HookRegistry.Debug("[StartEngagement] set mood {0}", mDate.GetMood());
+							});
+							th.Start();
+						}
+					}
+					return null;
+				case "Pathea.EG.EGMgr::StopEngagement": //取消嫉妒
+					if ((EGStopType)args[0] == EGStopType.Jealous)
+					{
+						return false;
+					}
+					else
+					{
+						return null;
+					}
+				case "Pathea.FavorSystemNs.FavorUtility::GetFavorBehaviorInfo": //玫瑰花1颗心
+					if ((int)args[1] == 7000016)
+					{
+						return new GiveGiftResult("75", 100, FeeLevelEnum.Excellent, GiftType.Normal);
+					} else
+					{
+						return null;
+					}
 				default:
 					return null;
 			}

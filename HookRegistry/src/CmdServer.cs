@@ -168,6 +168,21 @@ namespace Hooks
 				case "RefreshPriceIndex": //更新物价指数
 					Module<StoreManagerV40>.Self.RefreshPriceIndex();
 					break;
+				case "ItemBar": //修改物品数量
+					{
+						int index= Convert.ToInt32(args["solt"].Trim())-1;
+						int num = Convert.ToInt32(args["num"].Trim());
+						var item = Module<Player>.Self.bag.itemBar.itemBarItems.ElementAt(index);
+						if(item  != null)
+						{
+							num = Mathf.Clamp(num, 1, item.ItemBase.MaxNumber);
+							item.ChangeNumber(num - item.Number);
+							return String.Format("slot {0} {2}({1}) => {3}", index + 1, item.ItemDataId, item.ItemBase.Name, item.Number);
+						}else
+						{
+							return "no item on bar";
+						}
+					}
 				case "Test":
 					return "test";
 			}

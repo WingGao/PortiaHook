@@ -28,3 +28,6 @@
 UILoader::OnInit
 UILoader::OnRelease
 Pathea.RiderNs.RidableModuleManager::TryDecreaseLoyalty
+Pathea.EG.EGMgr::StartEngagement
+Pathea.EG.EGMgr::StopEngagement
+Pathea.FavorSystemNs.FavorUtility::GetFavorBehaviorInfo
